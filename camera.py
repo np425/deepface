@@ -27,6 +27,18 @@ def detect(frame, model):
     pprint(demographies)
     return demographies, elapsed_time
 
+def emotion_to_lithuanian(emotion):
+    emotions = {
+        "angry": "piktas",
+        "disgust": "pasibjaurejes",
+        "fear": "issigandes",
+        "happy": "laimingas",
+        "neutral": "be emocijos",
+        "sad": "liudnas",
+        "surprise": "nustebes",
+    }
+    return emotions[emotion]
+
 def draw_face_region(image, result, backend, elapsed_time):
     image = image.copy()
     for face in result:
@@ -36,13 +48,15 @@ def draw_face_region(image, result, backend, elapsed_time):
         
         # Draw the rectangle around the detected face
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        emotion_lt = emotion_to_lithuanian(emotion)
         
         # Put the age text above the rectangle
-        text = f"Emotion: {emotion}"
+        text = f"{emotion_lt}"
         cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     
     # Draw the backend name in the top-right corner
-    cv2.putText(image, f"{backend} {elapsed_time:.2f}", (image.shape[1] - 150, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+    # cv2.putText(image, f"{backend} {elapsed_time:.2f}", (image.shape[1] - 150, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
     
     return image
 
