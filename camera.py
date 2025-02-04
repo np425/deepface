@@ -5,19 +5,9 @@ import time
 import os
 
 backends = [
-  'opencv', 
-  'ssd', 
-#   'dlib', 
-  'mtcnn', 
+  'centerface',
   'fastmtcnn',
   'retinaface', 
-  'mediapipe',
-  'yolov8',
-  'yolov11s',
-  'yolov11n',
-  'yolov11m',
-  'yunet',
-  'centerface',
 ]
 
 def detect(frame, model):
@@ -25,10 +15,10 @@ def detect(frame, model):
     start_time = time.perf_counter()
     demographies = DeepFace.analyze(
         img_path = frame,
-        actions = ['age'],
+        actions = ['emotion'],
         detector_backend = model,
-        align = False,
-        enforce_detection=False
+        align = True,
+        enforce_detection=False,
     )
     elapsed_time = time.perf_counter() - start_time
     print(f"Detection time {elapsed_time:.2f}s")
@@ -40,14 +30,14 @@ def draw_face_region(image, result, backend, elapsed_time):
     image = image.copy()
     for face in result:
         region = face['region']
-        age = face['age']
+        emotion = face['dominant_emotion']
         x, y, w, h = region['x'], region['y'], region['w'], region['h']
         
         # Draw the rectangle around the detected face
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         
         # Put the age text above the rectangle
-        text = f"Age: {age}"
+        text = f"Emotion: {emotion}"
         cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     
     # Draw the backend name in the top-right corner
@@ -113,6 +103,22 @@ for backend in backends:
         # Continue to next image only when spacebar is pressed
         elif key != ord(' '):  # If any other key is pressed, keep waiting
             continue
+
+# for frame in camera_iter():
+#     backend = 'retinaface'
+#     res, elapsed_time = detect(frame, backend)  # Assuming detect function exists
+#     image = draw_face_region(frame, res, backend, elapsed_time)  # Draw on the image
+
+#     # Display the resulting frame
+#     cv2.imshow('Image Display', image)
+
+#     # Wait for key press
+#     key = cv2.waitKey(1) & 0xFF  # Wait indefinitely until a key is pressed
+
+#     # Break loop if 'q' is pressed
+#     if key == ord('q'):
+#         break
+
 
 # Close all OpenCV windows after processing
 cv2.destroyAllWindows()
